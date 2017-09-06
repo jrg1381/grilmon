@@ -1,0 +1,91 @@
+<!doctype html>
+<head>
+    <script src="{{url_for('static', filename='js/angular.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery-3.2.1.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/popper.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/octicons.css') }}"/>
+    <title>Hello from Flask</title>
+    <script>
+        var EMPTY_STATUS = { "stdout" : "", "stderr": "", returnCode: 0};
+
+        var app = angular.module('grilmon', [])
+            .controller('GrilmonController', ['$scope', '$http', function($scope, $http) {
+                var grilmon = this;
+
+                grilmon.shutdownScheduled = false;
+                grilmon.status = EMPTY_STATUS;
+
+                grilmon.refresh = function() {
+                    grilmon.fetch();
+                    grilmon.status = EMPTY_STATUS;
+                };
+
+                grilmon.fetch = function () {
+                    $http({method: "GET", url: "/api/processes"}).then(function (response) {
+                        grilmon.lastUpdate = Date();
+                        grilmon.processes = response.data;
+                    })
+                };
+
+                grilmon.shutdown = function () {
+                    $http({method: "POST", url: "/api/shutdown"}).then(function (response) {
+                        grilmon.status = response.data;
+                        grilmon.shutdownScheduled = !grilmon.shutdownScheduled;
+                    })
+                };
+
+                grilmon.closeBrowsers = function () {
+                    $http({method: "POST", url: "/api/close-browser"}).then(function (response) {
+                        grilmon.status = response.data;
+                        grilmon.fetch();
+                    })
+                };
+
+                grilmon.fetch();
+            }]);
+
+        app.config(['$interpolateProvider', function($interpolateProvider) {
+        $interpolateProvider.startSymbol('{A');
+        $interpolateProvider.endSymbol('A}');
+}]);
+    </script>
+</head>
+<html ng-app="grilmon">
+<div ng-controller="GrilmonController as grilmonController" class="container container-fluid">
+    <h1>Grilmon</h1>
+    <h3>{A grilmonController.lastUpdate A}</h3>
+    <div class="alert"
+         ng-class="grilmonController.status.returnCode ? 'alert-warning' : 'alert-info'"
+         ng-show="grilmonController.status.stdout||grilmonController.status.stderr">
+        <p>{A grilmonController.status.stdout A}</p>
+        <p>{A grilmonController.status.stderr A}</p>
+    </div>
+    <div class="col-lg-12">
+        <form target="" method="POST">
+            <div class="form-control">
+                <div class="btn-group" role="group" aria-label="Process control">
+                    <button class="btn btn-default" ng-click="grilmonController.shutdown()">{A grilmonController.shutdownScheduled ? "Cancel shutdown" : "Shutdown" A}</button>
+                    <button class="btn btn-default" ng-click="grilmonController.closeBrowsers()">Close browsers</button>
+                </div>
+                <div class="btn-group float-right" role="group" aria-label="Refresh">
+                    <button type="button" class="btn btn-secondary" ng-click="grilmonController.refresh()">
+                        <span class="octicon"><img src="{{ url_for('static', filename='svg/reply.svg') }}"/></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <table class="table">
+            <tr ng-repeat="item in grilmonController.processes">
+                <td>
+                    ({A item[1] A}) {A item[0] A}
+                </td>
+                <td>
+                    {A item[2] A}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</html>
