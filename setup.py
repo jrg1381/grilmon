@@ -8,6 +8,6 @@ setup(
     url='https://github.com/jrg1381/grilmon',
     license='GNU General Public License v3.0',
     author='jrg',
-    author_email='',
+    author_email='spam@example.com',
     description='Simple remote monitoring UI', requires=['psutil', 'flask']
 )
