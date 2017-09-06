@@ -33,6 +33,9 @@
                     $http({method: "POST", url: "/api/shutdown"}).then(function (response) {
                         grilmon.status = response.data;
                         grilmon.shutdownScheduled = !grilmon.shutdownScheduled;
+                        if(!grilmon.status.stdout && grilmon.status.returnCode == 0) {
+                            grilmon.status.stdout = "Success";
+                        }
                     })
                 };
 
@@ -59,10 +62,10 @@
     <div class="alert"
          ng-class="grilmonController.status.returnCode ? 'alert-warning' : 'alert-info'"
          ng-show="grilmonController.status.stdout||grilmonController.status.stderr">
-        <p>{A grilmonController.status.stdout A}</p>
-        <p>{A grilmonController.status.stderr A}</p>
+        <p ng-show="grilmonController.status.stdout">{A grilmonController.status.stdout A}</p>
+        <p ng-show="grilmonController.status.stderr">{A grilmonController.status.stderr A}</p>
     </div>
-    <div class="col-lg-12">
+    <div class="col-lg-11">
         <form target="" method="POST">
             <div class="form-control">
                 <div class="btn-group" role="group" aria-label="Process control">
