@@ -9,3 +9,7 @@ services:
      - FLASK_DEBUG=1
     volumes:
      - ./grilmon:/src/grilmon
+  builder:
+    build: .
+    volumes:
+     - .:/src/grilmon
