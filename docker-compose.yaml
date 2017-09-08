@@ -1,0 +1,11 @@
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+     - "5000:5000"
+    environment:
+     - FLASK_APP=grilmon/main.py
+     - FLASK_DEBUG=1
+    volumes:
+     - ./grilmon:/src/grilmon
