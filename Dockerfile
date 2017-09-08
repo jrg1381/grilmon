@@ -1,7 +1,7 @@
 FROM python:3.6
 
 EXPOSE 5000
-ADD grilmon/requirements.txt /requirements.txt
+ADD requirements.txt /requirements.txt
 ADD Makefile /src/Makefile
 ADD fakebin/killall /usr/bin/killall
 RUN pip install -r /requirements.txt
