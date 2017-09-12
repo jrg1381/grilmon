@@ -17,7 +17,7 @@ container:
 	docker-compose up --build -d
 
 package: container
-	$(BUILDER) echo "Build a debian package"
+	$(BUILDER) dpkg-buildpackage -us -uc
 
 build:
 	python setup.py sdist

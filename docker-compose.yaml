@@ -8,8 +8,10 @@ services:
      - FLASK_APP=grilmon/main.py
      - FLASK_DEBUG=1
     volumes:
-     - ./grilmon:/src/grilmon
+     - .:/src
+     - /run/systemd:/run/systemd
   builder:
-    build: .
-    volumes:
-     - .:/src/grilmon
+    build:
+        context: .
+        dockerfile: Dockerfile.builder
+
